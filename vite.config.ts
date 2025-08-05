@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
 export default defineConfig({
-  base: '/link-shortener/',
+  base: '/shortener/',
   plugins: [react()],
   build: {
     rollupOptions: {
