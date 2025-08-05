@@ -17,8 +17,8 @@ export const LinkCard: React.FC<LinkCardProps> = ({ link, onEdit, onDelete, onCo
   const shortUrl =
     link.shortUrl ||
     `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, '')}/${
-      link.userId
-    }/${link.customAlias || link.shortCode}`;
+      link.customAlias || link.shortCode
+    }`;
   const displayUrl = showFullUrl ? link.originalUrl : 
     link.originalUrl.length > 50 ? link.originalUrl.substring(0, 50) + '...' : link.originalUrl;
 
