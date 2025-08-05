@@ -13,9 +13,8 @@ export const LinkForm: React.FC = () => {
   const [description, setDescription] = useState('');
   const [openInNewTab, setOpenInNewTab] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const { themeConfig } = useTheme();
-
-  const generateShortCode = () => Math.random().toString(36).substring(2, 8);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +24,6 @@ export const LinkForm: React.FC = () => {
     try {
       await createLink({
         originalUrl: originalUrl.trim(),
-        shortCode: customAlias.trim() || generateShortCode(),
         customAlias: customAlias.trim() || undefined,
         title: title.trim() || undefined,
         description: description.trim() || undefined,
@@ -40,8 +38,14 @@ export const LinkForm: React.FC = () => {
       setTitle('');
       setDescription('');
       setOpenInNewTab(true);
+      setError('');
     } catch (error) {
       console.error('Error creating link:', error);
+      if (error instanceof Error && error.message.includes('Custom alias')) {
+        setError('This alias is already in use. Please choose another.');
+      } else {
+        setError('Failed to create link.');
+      }
     } finally {
       setLoading(false);
     }
@@ -80,11 +84,15 @@ export const LinkForm: React.FC = () => {
           <input
             type="text"
             value={customAlias}
-            onChange={(e) => setCustomAlias(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ''))}
+            onChange={(e) => {
+              setCustomAlias(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ''));
+              setError('');
+            }}
             placeholder="my-custom-link"
             className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-900 dark:text-gray-100"
           />
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Only letters, numbers, hyphens, and underscores allowed</p>
+          {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
         </div>
 
         <div>
