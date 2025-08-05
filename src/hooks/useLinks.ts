@@ -4,13 +4,15 @@ import {
   query, 
   where, 
   orderBy, 
-  onSnapshot, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  doc, 
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
   increment,
-  Timestamp 
+  Timestamp,
+  getDocs,
+  limit
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Link } from '../types';
@@ -39,11 +41,9 @@ export const useLinks = (userId: string | null) => {
         return {
           id: doc.id,
           ...data,
-          shortUrl:
-            data.shortUrl ||
-            `${basePath.replace(/\/$/, '')}/${data.userId}/${
-              data.customAlias || data.shortCode
-            }`,
+          shortUrl: `${basePath.replace(/\/$/, '')}/${
+            data.customAlias || data.shortCode
+          }`,
           openInNewTab: data.openInNewTab ?? true,
           createdAt: data.createdAt?.toDate() || new Date(),
           updatedAt: data.updatedAt?.toDate() || new Date(),
@@ -71,10 +71,48 @@ export const useLinks = (userId: string | null) => {
     }
 
     try {
+      const generateShortCode = () =>
+        Math.random().toString(36).substring(2, 8);
+
+      const isSlugTaken = async (slug: string) => {
+        const [codeSnap, aliasSnap] = await Promise.all([
+          getDocs(
+            query(
+              collection(db, 'links'),
+              where('shortCode', '==', slug),
+              limit(1)
+            )
+          ),
+          getDocs(
+            query(
+              collection(db, 'links'),
+              where('customAlias', '==', slug),
+              limit(1)
+            )
+          ),
+        ]);
+        return !codeSnap.empty || !aliasSnap.empty;
+      };
+
+      let shortCode = linkData.shortCode;
+      if (linkData.customAlias) {
+        if (await isSlugTaken(linkData.customAlias)) {
+          throw new Error('Custom alias already in use');
+        }
+        shortCode = linkData.customAlias;
+      } else {
+        while (await isSlugTaken(shortCode)) {
+          shortCode = generateShortCode();
+        }
+      }
+
       const basePath = window.location.origin + import.meta.env.BASE_URL;
-      const shortUrl = `${basePath.replace(/\/$/, '')}/${userId}/${linkData.shortCode}`;
+      const shortUrl = `${basePath.replace(/\/$/, '')}/${
+        linkData.customAlias || shortCode
+      }`;
       await addDoc(collection(db, 'links'), {
         ...linkData,
+        shortCode,
         shortUrl,
         userId,
         clicks: 0,
