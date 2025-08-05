@@ -45,6 +45,7 @@ export const useLinks = (userId: string | null) => {
             data.customAlias || data.shortCode
           }`,
           openInNewTab: data.openInNewTab ?? true,
+          isActive: data.isActive ?? true,
           createdAt: data.createdAt?.toDate() || new Date(),
           updatedAt: data.updatedAt?.toDate() || new Date(),
         } as Link;
@@ -94,7 +95,7 @@ export const useLinks = (userId: string | null) => {
         return !codeSnap.empty || !aliasSnap.empty;
       };
 
-      let shortCode = linkData.shortCode;
+      let shortCode = linkData.shortCode || generateShortCode();
       if (linkData.customAlias) {
         if (await isSlugTaken(linkData.customAlias)) {
           throw new Error('Custom alias already in use');
@@ -115,6 +116,7 @@ export const useLinks = (userId: string | null) => {
         shortCode,
         shortUrl,
         userId,
+        isActive: linkData.isActive ?? true,
         clicks: 0,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
