@@ -42,6 +42,7 @@ export const LinkForm: React.FC = () => {
     } catch (error) {
       console.error('Error creating link:', error);
       if (error instanceof Error && error.message.includes('Custom alias')) {
+        alert('This alias is already in use. Please choose another.');
         setError('This alias is already in use. Please choose another.');
       } else {
         setError('Failed to create link.');
