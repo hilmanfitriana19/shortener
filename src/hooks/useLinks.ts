@@ -59,16 +59,16 @@ export const useLinks = (userId: string | null) => {
   }, [userId]);
 
   const createLink = async (
-    linkData: Omit<Link, 'id' | 'createdAt' | 'updatedAt' | 'clicks' | 'shortUrl'>
+    linkData: Omit<Link, 'id' | 'createdAt' | 'updatedAt' | 'clicks' | 'shortUrl' | 'shortCode'>
   ) => {
     if (!userId) return;
 
     if (!linkData.title) {
-      linkData.title = ""
+      linkData.title = "";
     }
 
-    if(!linkData.description) {
-      linkData.description = ""
+    if (!linkData.description) {
+      linkData.description = "";
     }
 
     try {
@@ -95,7 +95,7 @@ export const useLinks = (userId: string | null) => {
         return !codeSnap.empty || !aliasSnap.empty;
       };
 
-      let shortCode = linkData.shortCode || generateShortCode();
+      let shortCode = generateShortCode();
       if (linkData.customAlias) {
         if (await isSlugTaken(linkData.customAlias)) {
           throw new Error('Custom alias already in use');
