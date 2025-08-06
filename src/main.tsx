@@ -12,7 +12,7 @@ console.log('Base Path:', basePath);
 console.log('Current Path:', path);
 
 
-const redirectMatch = path.match(/^\/([^/]+)\/([^/?#]+)/);
+const redirectMatch = path.match(/^\/([^/]+)/);
 console.log('Redirect Match:', redirectMatch);
 if (redirectMatch) {
   const slug = decodeURIComponent(redirectMatch[1]);
