@@ -7,6 +7,7 @@ import { fetchLinkBySlug, incrementLinkClicks } from './utils/linkApi';
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 const path = window.location.pathname.replace(basePath, '');
 
+console.log('Environment Base URL:', import.meta.env.BASE_URL);
 console.log('Base Path:', basePath);
 console.log('Current Path:', path);
 
@@ -14,7 +15,7 @@ console.log('Current Path:', path);
 const redirectMatch = path.match(/^\/([^/]+)\/([^/?#]+)/);
 console.log('Redirect Match:', redirectMatch);
 if (redirectMatch) {
-  const slug = decodeURIComponent(redirectMatch[2]);
+  const slug = decodeURIComponent(redirectMatch[1]);
   (async () => {
     const link = await fetchLinkBySlug(slug);
     if (link) {
